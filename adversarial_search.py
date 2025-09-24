@@ -1,6 +1,4 @@
 from typing import Dict, Tuple, Optional, Union
-import heapq
-import itertools
 
 from adversarial_search_problem import (
     Action,
@@ -31,10 +29,9 @@ def minimax(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff_de
     stats = {
         'states_expanded': 0
     }
-    counter = itertools.count()
 
     # TODO: Implement the minimax algorithm. Feel free to write helper functions.
-    def minimax_value(state, action, asp, cutoff_depth=float('inf')):
+    def minimax_value(state, asp, cutoff_depth=float('inf')):
         """
         Returns
         -------
@@ -44,7 +41,7 @@ def minimax(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff_de
         stats['states_expanded'] += 1
 
         if asp.is_terminal_state(state):
-            return asp.get_result(state), action
+            return asp.get_result(state), None
         
 
         if state.player_to_move() == 0:
@@ -55,31 +52,32 @@ def minimax(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff_de
             raise Exception("Invalid player")
 
     def max_value(state, asp, cutoff_depth=float('inf')):
-        heap = [(float('-inf'), next(counter), None)]
-        heapq.heapify(heap)
-
+        value, best_action = float('-inf'), None
         for action in asp.get_available_actions(state):
             successor = asp.transition(state, action)
-            value, _ = minimax_value(successor, action, asp, cutoff_depth=cutoff_depth)
-            heapq.heappush(heap, (value, next(counter), action))
-        
-        res = heapq.nlargest(1, heap)[0]
-        return res[0], res[2]
+            successor_value, _ = minimax_value(successor, asp, cutoff_depth=cutoff_depth)
+            value, best_action = max(
+                (value, best_action),
+                (successor_value, action),
+                key=lambda x: x[0]
+            )
+        return value, best_action
 
-    def min_value(state, asp, cutoff_depth=float('inf')):        
-        heap = [(float('inf'), next(counter), None)]
-        heapq.heapify(heap)
+    def min_value(state, asp, cutoff_depth=float('inf')):    
 
+        value, best_action = float('inf'), None
         for action in asp.get_available_actions(state):
             successor = asp.transition(state, action)
-            value, _ = minimax_value(successor, action, asp, cutoff_depth=cutoff_depth)
-            heapq.heappush(heap, (value, next(counter), action))
-        
-        res = heapq.nsmallest(1, heap)[0]
-        return res[0], res[2]
+            successor_value, _ = minimax_value(successor, asp, cutoff_depth=cutoff_depth)
+            value, best_action = min(
+                (value, best_action),
+                (successor_value, action),
+                key=lambda x: x[0]
+            )
+        return value, best_action
 
     start_state = asp.get_start_state()
-    _, best_action = minimax_value(start_state, None, asp)
+    _, best_action = minimax_value(start_state, asp)
 
     return best_action, stats
 
@@ -107,10 +105,10 @@ def alpha_beta(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff
     stats = {
         'states_expanded': 0  # Increase by 1 for every state transition
     }
-    counter = itertools.count()
     
     # TODO: Implement the alpha-beta pruning algorithm. Feel free to use helper functions.
-    def alpha_beta_pruning(state, action, asp, alpha, beta, cutoff_depth=float('inf')):
+    def alpha_beta_pruning(state, asp, alpha, beta, cutoff_depth=float('inf')):
+        
         """
         Returns
         -------
@@ -120,7 +118,7 @@ def alpha_beta(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff
         stats['states_expanded'] += 1
 
         if asp.is_terminal_state(state):
-            return asp.get_result(state), action
+            return asp.get_result(state), None
         
         if state.player_to_move() == 0:
             return max_value(state, asp, alpha, beta, cutoff_depth=cutoff_depth)
@@ -134,9 +132,15 @@ def alpha_beta(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff
         value, best_action = float('-inf'), None
         for action in asp.get_available_actions(state):
             successor = asp.transition(state, action)
-            value, best_action = max((value, best_action), alpha_beta_pruning(successor, action, asp, alpha, beta, cutoff_depth=cutoff_depth), key=lambda x: x[0])
+            successor_value, _ = alpha_beta_pruning(
+                successor, asp, alpha, beta, cutoff_depth=cutoff_depth
+            )
+            value, best_action = max(
+                (value, best_action),
+                (successor_value, action),
+                key=lambda x: x[0]
+            )
         if value >= beta:
-            print('AB_MAXVAL_RETURN')
             return value, best_action
         alpha = max(alpha, value)
         return value, best_action
@@ -146,34 +150,19 @@ def alpha_beta(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff
         value, best_action = float('inf'), None
         for action in asp.get_available_actions(state):
             successor = asp.transition(state, action)
-            value, best_action = min((value, best_action), alpha_beta_pruning(successor, action, asp, alpha, beta, cutoff_depth=cutoff_depth), key=lambda x: x[0])
+            successor_value, _ = alpha_beta_pruning(
+                successor, asp, alpha, beta, cutoff_depth=cutoff_depth
+            )
+            value, best_action = min(
+                (value, best_action),
+                (successor_value, action),
+                key=lambda x: x[0]
+            )
         if value <= alpha:
-            print('AB_MINVAL_RETURN')
             return value, best_action
         beta = min(beta, value)
         return value, best_action
 
     start_state = asp.get_start_state()
-    _, best_action = alpha_beta_pruning(start_state, None, asp, -1, 1)
+    _, best_action = alpha_beta_pruning(start_state, asp, -1, 1)
     return best_action, stats
-
-
-###########
-
-# X = True
-# _ = False
-# matrix = [
-#     [_, X, X, _, _, _, _],
-#     [_, _, _, X, X, _, _],
-#     [_, _, _, _, _, X, X],
-#     [_, _, _, _, _, _, _],
-#     [_, _, _, _, _, _, _],
-#     [_, _, _, _, _, _, _],
-#     [_, _, _, _, _, _, _],
-# ]
-# start_state = DAGState(0, 0)
-# terminal_evaluations = {3: -1., 4: -2., 5: -3., 6: -4.}
-
-# dag = GameDAG(matrix, start_state, terminal_evaluations)
-# result, _ = alpha_beta(dag)
-# self._check_result(result, dag)

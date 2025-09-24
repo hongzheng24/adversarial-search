@@ -299,7 +299,7 @@ class IOTest(unittest.TestCase):
         result, _ = alpha_beta(dag)
         self._check_result(result, dag)
 
-    def _test_alpha_beta_dag(self) -> None:
+    def test_alpha_beta_dag(self) -> None:
         X = True
         _ = False
         
