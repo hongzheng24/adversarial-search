@@ -31,7 +31,7 @@ def minimax(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff_de
     }
 
     # TODO: Implement the minimax algorithm. Feel free to write helper functions.
-    def minimax_value(state, asp, cutoff_depth=float('inf')):
+    def minimax_value(state, asp, depth, cutoff_depth=float('inf')):
         """
         Returns
         -------
@@ -42,20 +42,22 @@ def minimax(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff_de
 
         if asp.is_terminal_state(state):
             return asp.get_result(state), None
+        elif depth >= cutoff_depth:
+            return asp.heuristic(state), None
         
 
         if state.player_to_move() == 0:
-            return max_value(state, asp, cutoff_depth=cutoff_depth)
+            return max_value(state, asp, depth + 1, cutoff_depth=cutoff_depth)
         elif state.player_to_move() == 1:
-            return min_value(state, asp, cutoff_depth=cutoff_depth)
+            return min_value(state, asp, depth + 1, cutoff_depth=cutoff_depth)
         else:
             raise Exception("Invalid player")
 
-    def max_value(state, asp, cutoff_depth=float('inf')):
+    def max_value(state, asp, depth, cutoff_depth=float('inf')):
         value, best_action = float('-inf'), None
         for action in asp.get_available_actions(state):
             successor = asp.transition(state, action)
-            successor_value, _ = minimax_value(successor, asp, cutoff_depth=cutoff_depth)
+            successor_value, _ = minimax_value(successor, asp, depth + 1, cutoff_depth=cutoff_depth)
             value, best_action = max(
                 (value, best_action),
                 (successor_value, action),
@@ -63,12 +65,12 @@ def minimax(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff_de
             )
         return value, best_action
 
-    def min_value(state, asp, cutoff_depth=float('inf')):    
+    def min_value(state, asp, depth, cutoff_depth=float('inf')):    
 
         value, best_action = float('inf'), None
         for action in asp.get_available_actions(state):
             successor = asp.transition(state, action)
-            successor_value, _ = minimax_value(successor, asp, cutoff_depth=cutoff_depth)
+            successor_value, _ = minimax_value(successor, asp, depth + 1, cutoff_depth=cutoff_depth)
             value, best_action = min(
                 (value, best_action),
                 (successor_value, action),
@@ -77,7 +79,7 @@ def minimax(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff_de
         return value, best_action
 
     start_state = asp.get_start_state()
-    _, best_action = minimax_value(start_state, asp)
+    _, best_action = minimax_value(start_state, asp, 0, cutoff_depth=cutoff_depth)
 
     return best_action, stats
 
@@ -107,7 +109,7 @@ def alpha_beta(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff
     }
     
     # TODO: Implement the alpha-beta pruning algorithm. Feel free to use helper functions.
-    def alpha_beta_pruning(state, asp, alpha, beta, cutoff_depth=float('inf')):
+    def alpha_beta_pruning(state, asp, alpha, beta, depth, cutoff_depth=float('inf')):
         
         """
         Returns
@@ -119,21 +121,23 @@ def alpha_beta(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff
 
         if asp.is_terminal_state(state):
             return asp.get_result(state), None
+        elif depth >= cutoff_depth:
+            return asp.huerisitc(state), None
         
         if state.player_to_move() == 0:
-            return max_value(state, asp, alpha, beta, cutoff_depth=cutoff_depth)
+            return max_value(state, asp, alpha, beta, depth + 1, cutoff_depth=cutoff_depth)
         elif state.player_to_move() == 1:
-            return min_value(state, asp, alpha, beta, cutoff_depth=cutoff_depth)
+            return min_value(state, asp, alpha, beta, depth + 1, cutoff_depth=cutoff_depth)
         else:
             raise Exception("Invalid player")
 
-    def max_value(state, asp, alpha, beta, cutoff_depth=float('inf')):
+    def max_value(state, asp, alpha, beta, depth, cutoff_depth=float('inf')):
 
         value, best_action = float('-inf'), None
         for action in asp.get_available_actions(state):
             successor = asp.transition(state, action)
             successor_value, _ = alpha_beta_pruning(
-                successor, asp, alpha, beta, cutoff_depth=cutoff_depth
+                successor, asp, alpha, beta, depth + 1, cutoff_depth=cutoff_depth
             )
             value, best_action = max(
                 (value, best_action),
@@ -145,13 +149,13 @@ def alpha_beta(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff
         alpha = max(alpha, value)
         return value, best_action
 
-    def min_value(state, asp, alpha, beta, cutoff_depth=float('inf')):
+    def min_value(state, asp, alpha, beta, depth, cutoff_depth=float('inf')):
 
         value, best_action = float('inf'), None
         for action in asp.get_available_actions(state):
             successor = asp.transition(state, action)
             successor_value, _ = alpha_beta_pruning(
-                successor, asp, alpha, beta, cutoff_depth=cutoff_depth
+                successor, asp, alpha, beta, depth + 1, cutoff_depth=cutoff_depth
             )
             value, best_action = min(
                 (value, best_action),
@@ -164,5 +168,5 @@ def alpha_beta(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff
         return value, best_action
 
     start_state = asp.get_start_state()
-    _, best_action = alpha_beta_pruning(start_state, asp, -1, 1)
+    _, best_action = alpha_beta_pruning(start_state, asp, -1, 1, 0)
     return best_action, stats
