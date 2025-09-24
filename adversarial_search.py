@@ -41,8 +41,12 @@ def minimax(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff_de
         stats['states_expanded'] += 1
 
         if asp.is_terminal_state(state):
+            if not isinstance(asp.get_result(state), (int, float, complex)):
+                raise Exception("Minimax terminal state is non numeric")
             return asp.get_result(state), None
         elif depth >= cutoff_depth:
+            if not isinstance(asp.heuristic(state), (int, float, complex)):
+                raise Exception("Minimax heuristic is non numeric")
             return asp.heuristic(state), None
         
         if state.player_to_move() == 0:
