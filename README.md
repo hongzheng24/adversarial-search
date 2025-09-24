@@ -1,1 +1,5 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/UlGPC6HR)
+
+TASK 4
+------
+I am convinced by the final experiment. Crazy Dave argued that alpha-beta pruning is better than minimax search in terms of efficacy, which can be measured both by performance score and computational efficiency. The results show that both algorithms achieve similar performance scores at the same cutoff depths, meaning neither is inherently stronger in terms of move quality. However, Crazy Dave’s graph demonstrates that alpha-beta pruning with cutoff depths of 3 and 4 explores significantly fewer states than minimax at the same depths, making it computationally less expensive. This efficiency allows alpha-beta pruning to run at higher cutoff depths within the same time budget as minimax, and deeper searches can lead to better performance.
