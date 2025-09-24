@@ -121,7 +121,7 @@ def alpha_beta(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff
         if asp.is_terminal_state(state):
             return asp.get_result(state), None
         elif depth >= cutoff_depth:
-            return asp.huerisitc(state), None
+            return asp.heuristic(state), None
         
         if state.player_to_move() == 0:
             return max_value(state, asp, alpha, beta, depth + 1, cutoff_depth=cutoff_depth)
