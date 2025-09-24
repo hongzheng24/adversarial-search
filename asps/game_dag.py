@@ -47,7 +47,7 @@ class GameDAG(HeuristicAdversarialSearchProblem[DAGState, Action]):
             a terminal state and the value is the value at that terminal state.
         """
         # Prevent cycles
-        print("DAG CHECK VALID MATRIX: ", matrix)
+        # print("DAG CHECK VALID MATRIX: ", matrix)
         if any(
             matrix[i][j]
             for i in range(len(matrix))

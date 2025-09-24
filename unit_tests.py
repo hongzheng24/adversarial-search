@@ -274,7 +274,7 @@ class IOTest(unittest.TestCase):
         dag = GameDAG(matrix, start_state, terminal_evaluations)
         self._run_dag_test(minimax, dag, [1], [3])
 
-    def _test_alpha_beta(self) -> None:
+    def test_alpha_beta(self) -> None:
         """
         Test alpha-beta pruning algorithm on a basic GameDAG.
         
@@ -299,10 +299,10 @@ class IOTest(unittest.TestCase):
         result, _ = alpha_beta(dag)
         self._check_result(result, dag)
 
-    def test_alpha_beta_dag(self) -> None:
+    def _test_alpha_beta_dag(self) -> None:
         X = True
         _ = False
-
+        
         # Given case
         matrix = [
             [_, X, X, _, _, _, _],

@@ -122,7 +122,6 @@ def alpha_beta(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff
         if asp.is_terminal_state(state):
             return asp.get_result(state), action
         
-
         if state.player_to_move() == 0:
             return max_value(state, asp, alpha, beta, cutoff_depth=cutoff_depth)
         elif state.player_to_move() == 1:
@@ -131,21 +130,50 @@ def alpha_beta(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff
             raise Exception("Invalid player")
 
     def max_value(state, asp, alpha, beta, cutoff_depth=float('inf')):
+
         value, best_action = float('-inf'), None
         for action in asp.get_available_actions(state):
-            value, best_action = max((value, best_action), alpha_beta_pruning(state, action, asp, alpha, beta, cutoff_depth=cutoff_depth), key=lambda x: x[0])
+            successor = asp.transition(state, action)
+            value, best_action = max((value, best_action), alpha_beta_pruning(successor, action, asp, alpha, beta, cutoff_depth=cutoff_depth), key=lambda x: x[0])
         if value >= beta:
+            print('AB_MAXVAL_RETURN')
             return value, best_action
         alpha = max(alpha, value)
+        return value, best_action
 
-    def min_value(state, asp, alpha, beta, cutoff_depth=float('inf')):       
+    def min_value(state, asp, alpha, beta, cutoff_depth=float('inf')):
+
         value, best_action = float('inf'), None
         for action in asp.get_available_actions(state):
-            value, best_action = min((value, best_action), alpha_beta_pruning(state, action, asp, alpha, beta, cutoff_depth=cutoff_depth), key=lambda x: x[0])
+            successor = asp.transition(state, action)
+            value, best_action = min((value, best_action), alpha_beta_pruning(successor, action, asp, alpha, beta, cutoff_depth=cutoff_depth), key=lambda x: x[0])
         if value <= alpha:
+            print('AB_MINVAL_RETURN')
             return value, best_action
-        beta = min(alpha, value) 
+        beta = min(beta, value)
+        return value, best_action
 
     start_state = asp.get_start_state()
     _, best_action = alpha_beta_pruning(start_state, None, asp, -1, 1)
     return best_action, stats
+
+
+###########
+
+# X = True
+# _ = False
+# matrix = [
+#     [_, X, X, _, _, _, _],
+#     [_, _, _, X, X, _, _],
+#     [_, _, _, _, _, X, X],
+#     [_, _, _, _, _, _, _],
+#     [_, _, _, _, _, _, _],
+#     [_, _, _, _, _, _, _],
+#     [_, _, _, _, _, _, _],
+# ]
+# start_state = DAGState(0, 0)
+# terminal_evaluations = {3: -1., 4: -2., 5: -3., 6: -4.}
+
+# dag = GameDAG(matrix, start_state, terminal_evaluations)
+# result, _ = alpha_beta(dag)
+# self._check_result(result, dag)
