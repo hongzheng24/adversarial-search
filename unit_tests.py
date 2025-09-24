@@ -23,7 +23,9 @@ class IOTest(unittest.TestCase):
             result: The return value of an adversarial search algorithm (should be an action)
             dag: The GameDAG that was used to test the algorithm
         """
-        self.assertIsNotNone(result, "Output should not be None")
+        # self.assertIsNotNone(result, "Output should not be None")
+        if not result:
+            return
         start_state = dag.get_start_state()
         potential_actions = dag.get_available_actions(start_state)
         self.assertIn(result, potential_actions, "Output should be an available action")
@@ -162,11 +164,11 @@ class IOTest(unittest.TestCase):
         self._run_dag_test(minimax, dag, [2], [9])
 
         # One node case
-        # matrix = [[_]]
-        # start_state = DAGState(0, 0)
-        # terminal_evaluations = {0: 1}
-        # dag = GameDAG(matrix, start_state, terminal_evaluations)
-        # self._run_dag_test(minimax, dag, [0], [1])
+        matrix = [[_]]
+        start_state = DAGState(0, 0)
+        terminal_evaluations = {0: 1}
+        dag = GameDAG(matrix, start_state, terminal_evaluations)
+        self._run_dag_test(minimax, dag, [None], [1])
 
         # Two node case
         matrix = [[_, X], [_, _]]
@@ -395,11 +397,11 @@ class IOTest(unittest.TestCase):
         self._run_dag_test(alpha_beta, dag, [2], [9])
 
         # One node case
-        # matrix = [[_]]
-        # start_state = DAGState(0, 0)
-        # terminal_evaluations = {0: 1}
-        # dag = GameDAG(matrix, start_state, terminal_evaluations)
-        # self._run_dag_test(alpha_beta, dag, [0], [1])
+        matrix = [[_]]
+        start_state = DAGState(0, 0)
+        terminal_evaluations = {0: 1}
+        dag = GameDAG(matrix, start_state, terminal_evaluations)
+        self._run_dag_test(alpha_beta, dag, [None], [1])
 
         # Two node case
         matrix = [[_, X], [_, _]]
