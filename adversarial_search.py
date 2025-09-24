@@ -45,7 +45,6 @@ def minimax(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff_de
         elif depth >= cutoff_depth:
             return asp.heuristic(state), None
         
-
         if state.player_to_move() == 0:
             return max_value(state, asp, depth + 1, cutoff_depth=cutoff_depth)
         elif state.player_to_move() == 1:
@@ -168,5 +167,5 @@ def alpha_beta(asp: HeuristicAdversarialSearchProblem[GameState, Action], cutoff
         return value, best_action
 
     start_state = asp.get_start_state()
-    _, best_action = alpha_beta_pruning(start_state, asp, -1, 1, 0)
+    _, best_action = alpha_beta_pruning(start_state, asp, -1, 1, 0, cutoff_depth=cutoff_depth)
     return best_action, stats
